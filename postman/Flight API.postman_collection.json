@@ -1,0 +1,274 @@
+{
+  "info": {
+    "name": "Lab 6 — Flight REST API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "flightId",
+      "value": "4"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 GET all flights",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/flights",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "flights"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 GET flight 1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/flights/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "flights",
+            "1"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"ID 1\", () => pm.expect(pm.response.json().id).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 POST new flight",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/flights",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "flights"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"departure\": \"Vienna\",\n  \"arrival\": \"Barcelona\",\n  \"departureDateTime\": \"2026-12-15T10:00:00\",\n  \"arrivalDateTime\": \"2026-12-15T12:30:00\",\n  \"price\": 175.5,\n  \"flight_number\": \"OS401\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+              "const flight = pm.response.json();",
+              "pm.collectionVariables.set(\"flightId\", String(flight.id));",
+              "pm.test(\"Created flight\", () => pm.expect(flight.flight_number).to.eql(\"OS401\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 GET created flight",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/flights/{{flightId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "flights",
+            "{{flightId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Created ID\", () => pm.expect(String(pm.response.json().id)).to.eql(pm.collectionVariables.get(\"flightId\")));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 DELETE created flight",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/flights/{{flightId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "flights",
+            "{{flightId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+              "pm.test(\"Empty body\", () => pm.expect(pm.response.text()).to.eql(\"\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 GET deleted flight",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/flights/{{flightId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "flights",
+            "{{flightId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 GET final list",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/flights",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "flights"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Deleted flight absent\", () => pm.expect(pm.response.json().some(f => String(f.id) === pm.collectionVariables.get(\"flightId\"))).to.eql(false));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 POST invalid flight",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/flights",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "flights"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
